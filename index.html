@@ -114,7 +114,7 @@
         //canvasCtx.drawImage(imageObj, 1294, 729);
         canvasCtx.drawImage(imageObj, 0, 0);
 
-
+/*
       var centerX = canvas.width / 2;
       var centerY = canvas.height / 2;
 
@@ -126,7 +126,7 @@
       canvasCtx.fill();
       canvasCtx.lineWidth = 5;
       canvasCtx.strokeStyle = '#003300';
-      canvasCtx.stroke();
+      canvasCtx.stroke();*/
 
 //canvasCtx.fillRect(10,10,10,10); // fill in the pixel at (10,10)
       };
@@ -166,6 +166,23 @@
                     vm.dataAge = moment(latestDataDate, "YYYY-MM-DD HH:mm:ss").toNow(true);
                     // initialiseChart(latestDataDate);
                     updateChart(latestDataDate);*/
+
+                     canvasCtx.drawImage(imageObj, 0, 0);
+
+var centerX = myArr.data.x;
+var centerY = myArr.data.y;
+     // var centerX = canvas.width / 2;
+     // var centerY = canvas.height / 2;
+
+      var radius = 30;
+
+      canvasCtx.beginPath();
+      canvasCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+      canvasCtx.fillStyle = 'red';
+      canvasCtx.fill();
+      canvasCtx.lineWidth = 5;
+      canvasCtx.strokeStyle = '#003300';
+      canvasCtx.stroke();
                 }
             };
             xmlhttp.open("GET", url, true);
