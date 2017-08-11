@@ -171,6 +171,33 @@
             xmlhttp.send();
         }, 5000);
 
+
+
+        setInterval(function() {
+
+            var xmlhttp = new XMLHttpRequest();
+            var url = "https://api.seamlesshq.com/tests/MYDD3dpos"; //no params, return latest data with latest date
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //myFunction(myArr);
+                    console.log(myArr.data);
+                    console.log(myArr.data.x, myArr.data.y, myArr.data.z);
+
+                   /* var latestDataDate = myArr.data.created_at;
+
+                    vm.batteryPercent = myArr.data.batt + "%";
+                    vm.dataAge = moment(latestDataDate, "YYYY-MM-DD HH:mm:ss").toNow(true);
+                    // initialiseChart(latestDataDate);
+                    updateChart(latestDataDate);*/
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }, 2000);
+
+
         function updateChart(currentToDate) {
             var currentFromDate = moment(currentToDate, "YYYY-MM-DD HH:mm:ss").subtract(2, 'minutes').format("YYYY-MM-DD HH:mm:ss");
             //var currentToDate = moment().format("YYYY-MM-DD HH:mm:ss");
