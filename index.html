@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IR remote</title>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.45/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="https://dash.seamlesshq.com/css/app.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://dash.seamlesshq.com/js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.45/js/bootstrap-datetimepicker.min.js"></script-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script-->
+    <script src="https://unpkg.com/mqtt@2.6.0/dist/mqtt.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img alt="Brand" src="seamlesshq.com/clients/seamless/images/logo.png" style="height: 100%;">
+                    </a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <!--  <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">Link</a></li>
+       <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+      </ul> -->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li {{ Request::is( '/live') ? ' class="active"' : null }}><a href="./live">Live</a></li>
+                        <li {{ Request::is( '/history') ? ' class="active"' : null }}><a href="./history">History</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <div id="app">
+            <p>Battery: {{ batteryPercent }}</p>
+            <p>Updated {{ dataAge }} ago</p>
+            <!--<example></example>-->
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <canvas id="myChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <canvas id="myChart2" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <canvas id="myChartRSSI" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    $(function() {
+
+        /*
+        charts js pallete
+         backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+        */
+
+        var ctx = document.getElementById("myChart");
+        var ctx2 = document.getElementById("myChart2");
+        var ctxRssi = document.getElementById("myChartRSSI");
+        var myChart;
+        var myChart2;
+        var myChartRssi;
+
+        startChart();
+
+        function startChart() {
+
+            var xmlhttp = new XMLHttpRequest();
+            var url = "https://api.seamlesshq.com/iotlabs/lora/humitemp"; //no params, return latest data with latest date
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //myFunction(myArr);
+                    console.log(myArr.data);
+
+                    var latestDataDate = myArr.data.created_at;
+
+                    vm.batteryPercent = myArr.data.batt + "%";
+                    vm.dataAge = moment(latestDataDate, "YYYY-MM-DD HH:mm:ss").toNow(true);
+                    initialiseChart(latestDataDate);
+                    //updateChart(latestDataDate);
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        };
+
+        setInterval(function() {
+
+            var xmlhttp = new XMLHttpRequest();
+            var url = "https://api.seamlesshq.com/iotlabs/lora/humitemp"; //no params, return latest data with latest date
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //myFunction(myArr);
+                    console.log(myArr.data);
+
+                    var latestDataDate = myArr.data.created_at;
+
+                    vm.batteryPercent = myArr.data.batt + "%";
+                    vm.dataAge = moment(latestDataDate, "YYYY-MM-DD HH:mm:ss").toNow(true);
+                    // initialiseChart(latestDataDate);
+                    updateChart(latestDataDate);
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }, 5000);
+
+        function updateChart(currentToDate) {
+            var currentFromDate = moment(currentToDate, "YYYY-MM-DD HH:mm:ss").subtract(2, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+            //var currentToDate = moment().format("YYYY-MM-DD HH:mm:ss");
+
+
+            var xmlhttp = new XMLHttpRequest();
+            var url = "https://api.seamlesshq.com/iotlabs/lora/humitemp?from=" + currentFromDate + "&to=" + currentToDate + "&filter=0";
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //myFunction(myArr);
+                    console.log(myArr.data);
+
+                    chartLabels = [];
+                    chartHumiData = [];
+                    chartTempData = [];
+                    chartRssiData = [];
+
+                    myArr.data.forEach(function(element, index, array) {
+
+
+                        chartLabels.push(new Date(element.created_at));
+                        chartHumiData.push(element.humi);
+                        chartTempData.push(element.temp);
+                        chartRssiData.push(element.rssi != null ? -element.rssi : null);
+
+                    });
+
+
+                    /*var chartData = {
+                            labels: chartLabels,
+                            datasets: [{
+                                label: 'Humidity',
+                                data: chartHumiData,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255,99,132,1)',
+                                borderWidth: 1,
+                            },{
+                                label: 'Temperature',
+                                data: chartTempData,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1,
+                            }]
+                        };*/
+
+
+
+
+
+
+                    myChart.data.labels = chartLabels;
+                    myChart2.data.labels = chartLabels;
+                    myChartRssi.data.labels = chartLabels;
+
+                    myChart.data.datasets[0].data = chartHumiData;
+                    myChart2.data.datasets[0].data = chartTempData;
+                    myChartRssi.data.datasets[0].data = chartRssiData;
+                    myChart.update();
+                    myChart2.update();
+                    myChartRssi.update();
+
+
+
+
+
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+
+        }
+
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                batteryPercent: "-",
+                dataAge: "-",
+            }
+        })
+
+
+
+
+        function initialiseChart(currentToDate) {
+
+
+            var currentFromDate = moment(currentToDate, "YYYY-MM-DD HH:mm:ss").subtract(2, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+            //var currentToDate = moment().format("YYYY-MM-DD HH:mm:ss");
+
+
+            var xmlhttp = new XMLHttpRequest();
+            var url = "https://api.seamlesshq.com/iotlabs/lora/humitemp?from=" + currentFromDate + "&to=" + currentToDate + "&filter=0";
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    //myFunction(myArr);
+                    //console.log(myArr.data);
+
+                    chartLabels = [];
+                    chartHumiData = [];
+                    chartTempData = [];
+                    chartRssiData = [];
+
+                    myArr.data.forEach(function(element, index, array) {
+
+
+                        chartLabels.push(new Date(element.created_at));
+                        chartHumiData.push(element.humi);
+                        chartTempData.push(element.temp);
+                        chartRssiData.push(element.rssi != null ? -element.rssi : null);
+
+                    });
+
+
+                    var chartData = {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Humidity',
+                            data: chartHumiData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255,99,132,1)',
+                            borderWidth: 1,
+                            tension: 0.3,
+                        }]
+                    };
+
+                    myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            /*title: {
+                                display: true,
+                                text: 'RHT Node'
+                            },*/
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        displayFormats: {
+                                            quarter: 'MMM YYY'
+                                        }
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        // max: 80,
+                                        //min: 60,
+                                        //stepSize: 0.1
+                                    }
+                                }]
+                            },
+                            animation: {
+                                duration: 0,
+                            },
+                        }
+                    });
+
+                    var chartData2 = {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Temperature',
+                            data: chartTempData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            tension: 0.3,
+                        }]
+                    };
+
+                    myChart2 = new Chart(ctx2, {
+                        type: 'line',
+                        data: chartData2,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            /*title: {
+                                display: true,
+                                text: 'RHT Node'
+                            },*/
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        displayFormats: {
+                                            quarter: 'MMM YYY'
+                                        }
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        //max: 40,
+                                        //min: 20,
+                                        //stepSize: 0.1
+                                    }
+                                }]
+                            },
+                            animation: {
+                                duration: 0,
+                            },
+                        }
+                    });
+
+
+                    var chartDataRssi = {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'RSSI',
+                            data: chartRssiData,
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1,
+                            tension: 0.3,
+                        }]
+                    };
+
+                    myChartRssi = new Chart(ctxRssi, {
+                        type: 'line',
+                        data: chartDataRssi,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            /*title: {
+                                display: true,
+                                text: 'RHT Node'
+                            },*/
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        displayFormats: {
+                                            quarter: 'MMM YYY'
+                                        }
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        //max: 0,
+                                        //min: 20,
+                                        //stepSize: 0.1
+                                    }
+                                }]
+                            },
+                            animation: {
+                                duration: 0,
+                            },
+                        }
+                    });
+
+
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+
+        }
+
+
+
+
+
+
+    });
+    </script>
+</body>
+
+</html>
