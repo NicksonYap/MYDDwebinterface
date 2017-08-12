@@ -29,9 +29,15 @@
     <script src="https://unpkg.com/mqtt@2.6.0/dist/mqtt.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
-    <!--script src="./heatcanvas.js"></script-->
+    <script src="./heatcanvas.js"></script>
     <style>
     #mapCanvas {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    #heatCanvas {
         display: block;
         width: 100%;
         height: auto;
@@ -85,36 +91,41 @@
         <!--img src="./floorplan.png" style="width: 100%; height: auto;"-->
         <div class="row">
             <div class="col-md-8">
-        <div id="app">
-            <p>Coordinate: {{ posx }}, {{ posy }}, {{ posz }}</p>
-        </div>
+                <div id="app">
+                    <p>Coordinate: {{ posx }}, {{ posy }}, {{ posz }}</p>
+                </div>
                 <div>
                     <canvas width="1294" height="729" id="mapCanvas"></canvas>
                 </div>
             </div>
             <div class="col-md-4">
-<div id="app2">
-            <p>Current Location: {{ currLoc }}</p>
-            <!--p>Count up: {{ countUp }}</p-->
-
-           <h4>Visitor activity log:</h4>
-  <!--p>The .table-striped class adds zebra-stripes to a table:</p-->            
-  <table class="table table-striped" id="activityTable">
-    <thead>
-      <tr>
-        <th>Location</th>
-        <th>Time Spent</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td> - </td>
-        <td> - </td>
-      </tr>
-    </tbody>
-  </table>
-
-            </div>
+                <div >
+                    <div class="row">
+                        <div>
+                            <canvas width="1294" height="729" id="heatCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="row" id="app2">
+                        <p>Current Location: {{ currLoc }}</p>
+                        <!--p>Count up: {{ countUp }}</p-->
+                        <h4>Visitor activity log:</h4>
+                        <!--p>The .table-striped class adds zebra-stripes to a table:</p-->
+                        <table class="table table-striped" id="activityTable">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Time Spent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td> - </td>
+                                    <td> - </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -123,8 +134,8 @@
 
         var canvas = document.getElementById("mapCanvas");
         var canvasCtx = canvas.getContext("2d");
-        //var heatmap = new HeatCanvas("mapCanvas");
-        //heatmap.bgcolor = [100,0,0,255];
+        var heatmap = new HeatCanvas("heatCanvas");
+         heatmap.bgcolor = [0,0,0,255];
         var imageObj = new Image();
 
         imageObj.onload = function() {
@@ -194,7 +205,6 @@
                     vm.posz = myArr.data.z;
 
 
-
                     /* var latestDataDate = myArr.data.created_at;
 
                      vm.batteryPercent = myArr.data.batt + "%";
@@ -209,18 +219,18 @@
                     if (myArr.data.x >= 220 && myArr.data.x <= 370 && myArr.data.y >= 360 && myArr.data.y <= 520) {
                         canvasCtx.fillStyle = 'green';
 
-                        if(!wasInCytron){
-                        console.log("in cytron!");
-                        prevCytronTime = moment();
-                        wasInCytron = true;
-                        vm2.currLoc = "Cytron";
-                    }
+                        if (!wasInCytron) {
+                            console.log("in cytron!");
+                            prevCytronTime = moment();
+                            wasInCytron = true;
+                            vm2.currLoc = "Cytron";
+                        }
                     } else {
 
-                        if(wasInCytron){
+                        if (wasInCytron) {
                             var timeTaken = moment().diff(prevCytronTime, 'seconds');
                             console.log('stayed at Cytron for: ', timeTaken);
-                            $('table').find('tbody').append('<tr><td>Cytron</td><td>' +timeTaken + ' sec</td></tr>');
+                            $('table').find('tbody').append('<tr><td>Cytron</td><td>' + timeTaken + ' sec</td></tr>');
                             wasInCytron = false;
                             vm2.currLoc = "-";
                         }
@@ -236,26 +246,26 @@
 
                     if (myArr.data.x >= 100 && myArr.data.x <= 180 && myArr.data.y >= 180 && myArr.data.y <= 320) {
                         canvasCtx.fillStyle = 'green';
-                        if(!wasAtTheAd){
-                        prevAdTime = moment();
-                        console.log("went into ad area!");
+                        if (!wasAtTheAd) {
+                            prevAdTime = moment();
+                            console.log("went into ad area!");
                             wasAtTheAd = true;
-                        vm2.currLoc = "Cytron";
+                            vm2.currLoc = "Cytron";
                         }
 
 
-                        if(wasAtTheAd){
+                        if (wasAtTheAd) {
                             vm2.countUp = moment().diff(prevAdTime, 'seconds') + ' secs';
                         }
                     } else {
 
-                        if(wasAtTheAd){
+                        if (wasAtTheAd) {
                             var timeTaken = moment().diff(prevAdTime, 'seconds');
                             console.log('stayed at Ad area for: ', timeTaken);
-                            $('table').find('tbody').append('<tr><td>Ad Area</td><td>' +timeTaken + ' sec</td></tr>');
+                            $('table').find('tbody').append('<tr><td>Ad Area</td><td>' + timeTaken + ' sec</td></tr>');
                             wasAtTheAd = false;
                             vm2.currLoc = "-";
-                        }else{
+                        } else {
                             vm2.countUp = "-";
                         }
                         canvasCtx.fillStyle = 'blue';
@@ -273,9 +283,19 @@
                     var centerX = myArr.data.x / 530 * 1200;
                     var centerY = 700 - myArr.data.y / 600 * 700 - 50;
 
+                    //heatmap.push(1279/2, 729/2, 1);
+                    //heatmap.push(905, 335, 50);
+                    console.log(centerX, centerY);
+                    if(centerX >= 0 && centerX <= 1279  && centerY >= 0 && centerY <= 729 ){
+
+                    heatmap.push(Math.round(centerX), Math.round(centerY), 100);
+                    }
+                    //heatmap.push(1279, 0, 50);
+                    //sheatmap.push(1279, 729, 50);
+                    console.log(centerX, centerY);
                     // var centerX = canvas.width / 2;
                     // var centerY = canvas.height / 2;
-                    //heatmap.render();
+                    heatmap.render(1, null, null);
                     var radius = 30;
 
                     canvasCtx.beginPath();
@@ -286,7 +306,7 @@
                     canvasCtx.strokeStyle = '#003300';
                     canvasCtx.stroke();
 
-
+                    
                     //canvasCtx.fillRect(1294,729,10,10);
                     //canvasCtx.fillRect(1200,700,10,10);
                 }
