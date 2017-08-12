@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
+<!-- saved from url=(0054)https://dash.seamlesshq.com/clients/seamless/mydd2017/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Indoor Traffic Monitor</title>
@@ -13,22 +12,22 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.45/css/bootstrap-datetimepicker.min.css">
-    <link rel="stylesheet" href="https://dash.seamlesshq.com/css/app.css">
+    <link rel="stylesheet" href="./Indoor Traffic Monitor_files/bootstrap-table.min.css">
+    <link rel="stylesheet" href="./Indoor Traffic Monitor_files/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="./Indoor Traffic Monitor_files/app.css">
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://dash.seamlesshq.com/js/app.js"></script>
+    <script src="./Indoor Traffic Monitor_files/app.js.download"></script>
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/heatcanvas/1.2.3/heatcanvas-worker.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heatcanvas/1.2.3/heatcanvas.js"></script-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script src="./Indoor Traffic Monitor_files/bootstrap-table.min.js.download"></script>
+    <script src="./Indoor Traffic Monitor_files/moment.min.js.download"></script>
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.45/js/bootstrap-datetimepicker.min.js"></script-->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+    <script type="text/javascript" src="./Indoor Traffic Monitor_files/loader.js.download"></script>
+    <script type="text/javascript" src="./Indoor Traffic Monitor_files/Chart.bundle.min.js.download"></script>
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script-->
-    <script src="https://unpkg.com/mqtt@2.6.0/dist/mqtt.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+    <script src="./Indoor Traffic Monitor_files/mqtt.min.js.download" type="text/javascript"></script>
+    <link rel="stylesheet" href="./Indoor Traffic Monitor_files/bootstrap-table.min.css">
+    <script src="./Indoor Traffic Monitor_files/bootstrap-table.min.js.download"></script>
 
     <!--script src="./heatcanvas.js"></script-->
     <style>
@@ -54,8 +53,8 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">
-                        <img alt="Brand" src="https://dash.seamlesshq.com/clients/seamless/images/logo.png" style="height: 100%;">
+                    <a class="navbar-brand" href="https://dash.seamlesshq.com/clients/seamless/mydd2017/#">
+                        <img alt="Brand" src="./Indoor Traffic Monitor_files/logo.png" style="height: 100%;">
                     </a>
                 </div>
                 <!-- Collect the nav links, forms, and other content for toggling -->
@@ -77,17 +76,15 @@
         </li>
       </ul> -->
                     <ul class="nav navbar-nav navbar-right">
-                        <li {{ Request::is( '/live') ? ' class="active"' : null }}><a href="./live">Live</a></li>
-                        <li {{ Request::is( '/history') ? ' class="active"' : null }}><a href="./history">History</a></li>
+                        <li {{="" request::is(="" '="" live')="" ?="" class="active" :="" null="" }}=""><a href="https://dash.seamlesshq.com/clients/seamless/mydd2017/live">Live</a></li>
+                        <li {{="" request::is(="" '="" history')="" ?="" class="active" :="" null="" }}=""><a href="https://dash.seamlesshq.com/clients/seamless/mydd2017/history">History</a></li>
                     </ul>
                 </div>
                 <!-- /.navbar-collapse -->
             </div>
             <!-- /.container-fluid -->
         </nav>
-        <div id="app">
-            <p>Coordinate: {{ posx }}, {{ posy }}, {{ posz }}</p>
-        </div>
+        <div id="app"><p>Coordinate: 178.9623, 495, 135.1667</p></div>
          <!--img src="./floorplan.png" style="width: 100%; height: auto;"-->
          <div class="row">
 
@@ -242,6 +239,7 @@ var centerY = 700-myArr.data.y/600*700-50;
 
     });
     </script>
-</body>
 
-</html>
+
+
+</body></html>
